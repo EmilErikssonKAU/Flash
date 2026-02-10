@@ -19,7 +19,14 @@ int main(int argc, char *argv[])
     buf[strlen(buf) - 1] = '\0'; // Remove newline
     if (!strcmp(buf, "exit"))
       break;
-    printf("%s: command not found\n", buf);
+    else if (!strncmp(buf, "echo", (sizeof("echo") - 1) * sizeof(char)))
+    {
+      printf("%s\n", buf + 5);
+    }
+    else
+    {
+      printf("%s: command not found\n", buf);
+    }
   }
 
   return 0;
