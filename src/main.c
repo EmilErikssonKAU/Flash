@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        printf("invalid_command: not found\n");
+        printf("%s: not found\n", second_lex);
       }
     }
     else
