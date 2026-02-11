@@ -65,42 +65,40 @@ int get_token()
     }
 
     // Read digit
-    if (isdigit(peak()))
-    {
-        while (isdigit(peak()))
-        {
-            next();
-        }
-        return number;
-    }
+    // if (isdigit(peak()))
+    // {
+    //     while (isdigit(peak()))
+    //     {
+    //         next();
+    //     }
+    //     return number;
+    // }
 
     // Read keyword or id
-    else if (isalpha(peak()))
+
+    while (!isspace(peak()) && peak() != '\0')
     {
-        while (isalnum(peak()) && !isspace(peak()))
-        {
-            next();
-        }
-        return lex2tok(lexeme_buffer);
+        next();
     }
+    return lex2tok(lexeme_buffer);
 
     // Read other characters
-    else
-    {
-        // Special case: 'character containing two characters'
-        if (peak() == ':' && input_buffer[input_pos + 1] == '=')
-            next();
-        next();
+    // else
+    // {
+    //     // Special case: 'character containing two characters'
+    //     if (peak() == ':' && input_buffer[input_pos + 1] == '=')
+    //         next();
+    //     next();
 
-        tokentype token = lex2tok(lexeme_buffer);
+    //     tokentype token = lex2tok(lexeme_buffer);
 
-        // if token comes back as id: it is undefined
-        // else: defined special character
-        if (token == id)
-            return undef;
-        else
-            return token;
-    }
+    //     // if token comes back as id: it is undefined
+    //     // else: defined special character
+    //     if (token == id)
+    //         return undef;
+    //     else
+    //         return token;
+    // }
 }
 
 char *get_lexeme()
