@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "tokentable.h"
 
@@ -16,8 +17,9 @@ static tab tokentab[] = {
     {"TERROR", nfound}};
 
 static tab keywordtab[] = {
-    {"exit", exit},
+    {"exit", exit_tok},
     {"echo", echo},
+    {"type", type},
     {"KERROR", nfound}};
 
 tokentype lex2tok(char *fplex)
@@ -76,4 +78,17 @@ char *tok2lex(tokentype ftok)
     }
 
     return lexeme;
+}
+
+bool is_keyword(char *lexeme)
+{
+    for (size_t i = 0; i < sizeof(keywordtab) / sizeof(tab); i++)
+    {
+        if (!strcmp(lexeme, keywordtab[i].text))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
