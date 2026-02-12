@@ -127,6 +127,12 @@ int main(int argc, char *argv[])
         printf("%s: not found\n", second_lex);
       }
     }
+    else if (!strcmp(first_lex, "pwd"))
+    {
+      char cwd[BUF_SIZE];
+      getcwd(cwd, sizeof(cwd));
+      printf("%s\n", cwd);
+    }
     else if (checkPath(first_lex, false))
     {
       build_argv(first_lex, cmd_argv);
