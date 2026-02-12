@@ -34,7 +34,8 @@ bool checkPath(char *lexeme, bool should_print)
     snprintf(buffer, sizeof(buffer), "%s/%s", path_section, lexeme);
     if (!access(buffer, X_OK))
     {
-      printf("%s is %s\n", lexeme, buffer);
+      if (should_print)
+        printf("%s is %s\n", lexeme, buffer);
       return true;
     }
     path_section = extractPath(NULL);
