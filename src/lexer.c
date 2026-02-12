@@ -16,14 +16,12 @@ static bool hasRead = false;
 bool fill_input_buffer(char *input)
 {
     int i = 0;
-    while (i < BUFSIZE - 1)
+    while (i < BUFSIZE - 1 && input[i] != '\0')
     {
         input_buffer[i] = input[i];
         i++;
     }
-
     input_buffer[i] = '\0';
-
     input_pos = 0;
     return true;
 }
@@ -35,7 +33,10 @@ static char peak()
 
 static void next()
 {
-    lexeme_buffer[lexeme_pos] = peak();
+    if (lexeme_pos < LEXSIZE - 1)
+    {
+        lexeme_buffer[lexeme_pos] = peak();
+    }
     input_pos++;
     lexeme_pos++;
 }
@@ -103,5 +104,8 @@ int get_token()
 
 char *get_lexeme()
 {
-    return lexeme_buffer;
+    if (lexeme_buffer[0] == '\0')
+        return NULL;
+    else
+        return lexeme_buffer;
 }
