@@ -10,7 +10,8 @@ typedef enum tokenvalues
    number,
    exit_tok,
    echo,
-   type
+   type,
+   pwd
 } tokentype;
 
 tokentype lex2tok(char *fplex); /* convert a lexeme  to a token    */

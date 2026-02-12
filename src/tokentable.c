@@ -20,6 +20,7 @@ static tab keywordtab[] = {
     {"exit", exit_tok},
     {"echo", echo},
     {"type", type},
+    {"pwd", pwd},
     {"KERROR", nfound}};
 
 tokentype lex2tok(char *fplex)
