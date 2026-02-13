@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
       get_token();
       second_lex = get_lexeme();
 
-      if (first_lex == NULL || first_lex[0] == '\0')
+      if (second_lex == NULL || second_lex[0] == '\0')
       {
         continue;
       }
@@ -132,6 +132,23 @@ int main(int argc, char *argv[])
       char cwd[BUF_SIZE];
       getcwd(cwd, sizeof(cwd));
       printf("%s\n", cwd);
+    }
+    else if (!strcmp(first_lex, "cd"))
+    {
+      get_token();
+      second_lex = get_lexeme();
+
+      if (second_lex == NULL || second_lex[0] == '\0')
+      {
+        continue;
+      }
+      else
+      {
+        if (chdir(second_lex))
+        {
+          printf("cd: %s: No such file or directory\n", second_lex);
+        }
+      }
     }
     else if (checkPath(first_lex, false))
     {
