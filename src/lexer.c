@@ -5,7 +5,7 @@
 #include "tokentable.h"
 
 #define BUFSIZE 1024
-#define LEXSIZE 30
+#define LEXSIZE 100
 
 static char input_buffer[BUFSIZE];
 static char lexeme_buffer[LEXSIZE];
