@@ -72,6 +72,13 @@ static bool handle_doublequotes(void)
     skip();
     while (peak() != '\"' && peak() != '\0')
     {
+        if (peak() == '\\')
+        {
+            if ((double_peak() == '\\') || (double_peak() == '"'))
+            {
+                skip();
+            }
+        }
         next();
     }
     if (peak() != '\"')
