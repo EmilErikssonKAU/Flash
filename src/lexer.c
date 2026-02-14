@@ -31,6 +31,11 @@ static char peak()
     return input_buffer[input_pos];
 }
 
+static char double_peak()
+{
+    return input_buffer[input_pos + 1];
+}
+
 static void next()
 {
     if (lexeme_pos < LEXSIZE - 1)
@@ -39,6 +44,27 @@ static void next()
     }
     input_pos++;
     lexeme_pos++;
+}
+
+static void skip()
+{
+    if (input_pos < BUFSIZE - 1)
+        input_pos++;
+}
+
+static bool handle_singlequotes(void)
+{
+    skip();
+    while (peak() != '\'' && peak() != '\0')
+    {
+        next();
+    }
+    if (peak() != '\'')
+    {
+        return false;
+    }
+    skip();
+    return true;
 }
 
 char *get_rest_of_input_buffer()
@@ -59,47 +85,24 @@ int get_token()
     {
         while (isspace(peak()))
         {
-            next();
+            skip();
         }
-        memset(lexeme_buffer, 0, sizeof(lexeme_buffer));
-        lexeme_pos = 0;
     }
 
-    // Read digit
-    // if (isdigit(peak()))
-    // {
-    //     while (isdigit(peak()))
-    //     {
-    //         next();
-    //     }
-    //     return number;
-    // }
-
-    // Read keyword or id
-
+    // Read keyword or word
     while (!isspace(peak()) && peak() != '\0')
     {
-        next();
+        if (peak() == '\'')
+        {
+            if (!handle_singlequotes())
+                return undef;
+        }
+        else
+        {
+            next();
+        }
     }
     return lex2tok(lexeme_buffer);
-
-    // Read other characters
-    // else
-    // {
-    //     // Special case: 'character containing two characters'
-    //     if (peak() == ':' && input_buffer[input_pos + 1] == '=')
-    //         next();
-    //     next();
-
-    //     tokentype token = lex2tok(lexeme_buffer);
-
-    //     // if token comes back as id: it is undefined
-    //     // else: defined special character
-    //     if (token == id)
-    //         return undef;
-    //     else
-    //         return token;
-    // }
 }
 
 char *get_lexeme()

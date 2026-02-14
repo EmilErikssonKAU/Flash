@@ -124,10 +124,35 @@ int main(int argc, char *argv[])
     {
       break;
     }
+
     else if (!strcmp(first_lex, "echo"))
     {
-      printf("%s\n", get_rest_of_input_buffer());
+      char *lexemes[MAX_ARGS];
+      int i = 0;
+      get_token();
+
+      while (i < MAX_ARGS - 1)
+      {
+        char *lex = get_lexeme();
+        if (lex == NULL)
+          break;
+        lexemes[i] = strdup(lex);
+        i++;
+        get_token();
+      }
+
+      for (int j = 0; j < i; j++)
+      {
+        printf("%s", lexemes[j]);
+
+        if (j < i - 1)
+          printf(" ");
+
+        free(lexemes[j]);
+      }
+      printf("\n");
     }
+
     else if (!strcmp(first_lex, "type"))
     {
       get_token();
@@ -142,17 +167,20 @@ int main(int argc, char *argv[])
       {
         printf("%s is a shell builtin\n", second_lex);
       }
+
       else if (!checkPath(second_lex, true))
       {
         printf("%s: not found\n", second_lex);
       }
     }
+
     else if (!strcmp(first_lex, "pwd"))
     {
       char cwd[BUF_SIZE];
       getcwd(cwd, sizeof(cwd));
       printf("%s\n", cwd);
     }
+
     else if (!strcmp(first_lex, "cd"))
     {
       get_token();
@@ -162,21 +190,26 @@ int main(int argc, char *argv[])
       {
         continue;
       }
+
       else
       {
         char *expanded_path = expand_path(second_lex);
+
         if (chdir(expanded_path))
         {
           printf("cd: %s: No such file or directory\n", second_lex);
         }
+
         free(expanded_path);
       }
     }
+
     else if (checkPath(first_lex, false))
     {
       build_argv(first_lex, cmd_argv);
       execute_program(cmd_argv);
     }
+
     else
     {
       printf("%s: command not found\n", buf);
