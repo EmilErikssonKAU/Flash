@@ -107,7 +107,12 @@ int get_token()
     // Read keyword or word
     while (!isspace(peak()) && peak() != '\0')
     {
-        if (peak() == '\"')
+        if (peak() == '\\')
+        {
+            skip();
+            next();
+        }
+        else if (peak() == '\"')
         {
             if (!handle_doublequotes())
                 return undef;
