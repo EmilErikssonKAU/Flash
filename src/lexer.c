@@ -67,6 +67,21 @@ static bool handle_singlequotes(void)
     return true;
 }
 
+static bool handle_doublequotes(void)
+{
+    skip();
+    while (peak() != '\"' && peak() != '\0')
+    {
+        next();
+    }
+    if (peak() != '\"')
+    {
+        return false;
+    }
+    skip();
+    return true;
+}
+
 char *get_rest_of_input_buffer()
 {
     return &input_buffer[input_pos + 1];
@@ -92,7 +107,12 @@ int get_token()
     // Read keyword or word
     while (!isspace(peak()) && peak() != '\0')
     {
-        if (peak() == '\'')
+        if (peak() == '\"')
+        {
+            if (!handle_doublequotes())
+                return undef;
+        }
+        else if (peak() == '\'')
         {
             if (!handle_singlequotes())
                 return undef;
