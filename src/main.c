@@ -11,7 +11,7 @@
 
 #define MAX_INPUT_LENGTH 100
 #define BUF_SIZE 1024
-#define MAX_ARGS 10
+#define MAX_ARGS 20
 
 char *extractPath(const char *PATH)
 {
@@ -28,10 +28,12 @@ bool checkPath(const char *lexeme, bool should_print)
 {
   char *PATH = getenv("PATH");
   char *path_section = extractPath(PATH);
+
   while (path_section != NULL)
   {
     char buffer[BUF_SIZE];
     snprintf(buffer, sizeof(buffer), "%s/%s", path_section, lexeme);
+
     if (!access(buffer, X_OK))
     {
       if (should_print)
@@ -63,16 +65,12 @@ char *expand_path(const char *path)
   return expanded_path;
 }
 
-void build_argv(char *prog_name, char *argv[])
+void build_argv(char *lexemes[], char *argv[])
 {
-
-  char *arg = prog_name;
   int i = 0;
-  while (arg != NULL && i < MAX_ARGS - 2)
+  while (i < MAX_ARGS - 1 && lexemes[i] != NULL)
   {
-    argv[i] = strdup(arg);
-    get_token();
-    arg = get_lexeme();
+    argv[i] = lexemes[i];
     i++;
   }
   argv[i] = NULL;
@@ -98,9 +96,14 @@ int main(int argc, char *argv[])
   setbuf(stdout, NULL); // Flush after every printf
   char buf[BUF_SIZE];
 
-  char *first_lex;
-  char *second_lex;
   char *cmd_argv[MAX_ARGS];
+
+  char *input_file = NULL;
+  char *output_file = NULL;
+  char *error_file = NULL;
+
+  char *lexemes[MAX_ARGS];
+  int tokens[MAX_ARGS];
 
   // Read-Eval-Print Loop
   while (true)
@@ -111,102 +114,93 @@ int main(int argc, char *argv[])
     buf[strlen(buf) - 1] = '\0'; // Remove newline
 
     fill_input_buffer(buf);
+    int j = 0;
+    tokens[j] = get_token();
 
-    get_token();
-    first_lex = get_lexeme();
+    while (j < MAX_ARGS - 2)
+    {
+      char *lex = get_lexeme();
+      if (lex == NULL)
+        break;
+      lexemes[j] = strdup(lex);
+      j++;
+      tokens[j] = get_token();
+    }
 
-    if (first_lex == NULL || first_lex[0] == '\0')
+    lexemes[j] = NULL;
+
+    if (lexemes[0] == NULL || lexemes[0][0] == '\0')
     {
       continue;
     }
 
-    if (!strcmp(first_lex, "exit"))
+    if (!strcmp(lexemes[0], "exit"))
     {
       break;
     }
 
-    else if (!strcmp(first_lex, "echo"))
+    else if (!strcmp(lexemes[0], "echo"))
     {
-      char *lexemes[MAX_ARGS];
-      int i = 0;
-      get_token();
-
-      while (i < MAX_ARGS - 1)
+      int i = 1;
+      while (lexemes[i] != NULL)
       {
-        char *lex = get_lexeme();
-        if (lex == NULL)
-          break;
-        lexemes[i] = strdup(lex);
-        i++;
-        get_token();
-      }
-
-      for (int j = 0; j < i; j++)
-      {
-        printf("%s", lexemes[j]);
-
-        if (j < i - 1)
+        if (i > 1)
           printf(" ");
-
-        free(lexemes[j]);
+        printf("%s", lexemes[i]);
+        i++;
       }
       printf("\n");
     }
 
-    else if (!strcmp(first_lex, "type"))
+    else if (!strcmp(lexemes[0], "type"))
     {
-      get_token();
-      second_lex = get_lexeme();
-
-      if (second_lex == NULL || second_lex[0] == '\0')
+      if (lexemes[1] == NULL || lexemes[1][0] == '\0')
       {
         continue;
       }
 
-      if (is_keyword(second_lex))
+      if (is_keyword(lexemes[1]))
       {
-        printf("%s is a shell builtin\n", second_lex);
+        printf("%s is a shell builtin\n", lexemes[1]);
       }
 
-      else if (!checkPath(second_lex, true))
+      else if (!checkPath(lexemes[1], true))
       {
-        printf("%s: not found\n", second_lex);
+        printf("%s: not found\n", lexemes[1]);
       }
     }
 
-    else if (!strcmp(first_lex, "pwd"))
+    else if (!strcmp(lexemes[0], "pwd"))
     {
       char cwd[BUF_SIZE];
       getcwd(cwd, sizeof(cwd));
       printf("%s\n", cwd);
     }
 
-    else if (!strcmp(first_lex, "cd"))
+    else if (!strcmp(lexemes[0], "cd"))
     {
-      get_token();
-      second_lex = get_lexeme();
 
-      if (second_lex == NULL || second_lex[0] == '\0')
+      if (lexemes[1] == NULL || lexemes[1][0] == '\0')
       {
         continue;
       }
 
       else
       {
-        char *expanded_path = expand_path(second_lex);
+        char *expanded_path = expand_path(lexemes[1]);
 
         if (chdir(expanded_path))
         {
-          printf("cd: %s: No such file or directory\n", second_lex);
+          printf("cd: %s: No such file or directory\n", lexemes[1]);
         }
 
         free(expanded_path);
       }
     }
 
-    else if (checkPath(first_lex, false))
+    else if (checkPath(lexemes[0], false))
     {
-      build_argv(first_lex, cmd_argv);
+      build_argv(lexemes, cmd_argv);
       execute_program(cmd_argv);
     }
 
@@ -214,6 +208,13 @@ int main(int argc, char *argv[])
     {
       printf("%s: command not found\n", buf);
     }
+
+    // Clear lexemes, and free memory
+    for (int i = 0; i < j; i++)
+    {
+      free(lexemes[i]);
+    }
+    memset(lexemes, 0, sizeof(lexemes));
   }
 
   return 0;
