@@ -7,14 +7,9 @@
 
 typedef struct tab
 {
-    char *text;
+    const char *text;
     int token;
 } tab;
-
-static tab tokentab[] = {
-    {"id", id},
-    {"undef", undef},
-    {"TERROR", nfound}};
 
 static tab keywordtab[] = {
     {"exit", TOK_EXIT},
@@ -24,67 +19,99 @@ static tab keywordtab[] = {
     {"cd", TOK_CD},
     {"KERROR", nfound}};
 
+static tab operatortab[] = {
+    {"1>", TOK_REDIR_STDOUT_FD1},
+    {"2>", TOK_REDIR_STDERR},
+    {">", TOK_REDIR_STDOUT},
+    {"OERROR", nfound}};
+
+static tab tokentab[] = {
+    {"undef", TOK_UNDEF},
+    {"WORD", TOK_WORD},
+    {"NUMBER", TOK_NUMBER},
+    {"exit", TOK_EXIT},
+    {"echo", TOK_ECHO},
+    {"type", TOK_TYPE},
+    {"pwd", TOK_PWD},
+    {"cd", TOK_CD},
+    {"1>", TOK_REDIR_STDOUT_FD1},
+    {"2>", TOK_REDIR_STDERR},
+    {">", TOK_REDIR_STDOUT},
+    {"TERROR", nfound}};
+
+static bool is_number_lexeme(const char *fplex)
+{
+    if (fplex == NULL || fplex[0] == '\0')
+    {
+        return false;
+    }
+
+    for (size_t i = 0; fplex[i] != '\0'; i++)
+    {
+        if (!isdigit((unsigned char)fplex[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 tokentype lex2tok(char *fplex)
 {
-    // Special case
-    if (!strcmp(fplex, "number"))
+    // Match explicit operator lexemes first.
+    for (int i = 0; operatortab[i].token != nfound; i++)
     {
-        return id;
+        if (!strcmp(fplex, operatortab[i].text))
+        {
+            return operatortab[i].token;
+        }
     }
 
-    // Search through tokentab
-    int i = 0;
-    while (tokentab[i].token != nfound)
+    // Match builtins/keywords next.
+    tokentype keyword_token = key2tok(fplex);
+    if (keyword_token != TOK_WORD)
     {
-        if (!strcmp(fplex, tokentab[i].text))
-            return tokentab[i].token;
-        i++;
+        return keyword_token;
     }
 
-    return key2tok(fplex);
+    if (is_number_lexeme(fplex))
+    {
+        return TOK_NUMBER;
+    }
+
+    return TOK_WORD;
 }
 
 tokentype key2tok(char *fplex)
 {
-    // Search through keyword tab
-    int i = 0;
-    while (keywordtab[i].token != nfound)
+    for (int i = 0; keywordtab[i].token != nfound; i++)
     {
         if (!strcmp(fplex, keywordtab[i].text))
+        {
             return keywordtab[i].token;
-        i++;
+        }
     }
 
-    return id;
+    return TOK_WORD;
 }
 
 char *tok2lex(tokentype ftok)
 {
-    char *lexeme = tokentab[1].text;
-
-    // iterate  through all tokens
-    for (int i = 0; i < 21; i++)
+    for (int i = 0; tokentab[i].token != nfound; i++)
     {
         if (tokentab[i].token == ftok)
         {
-            lexeme = tokentab[i].text;
+            return (char *)tokentab[i].text;
         }
     }
 
-    for (int i = 0; i < 10; i++)
-    {
-        if (keywordtab[i].token == ftok)
-        {
-            lexeme = keywordtab[i].text;
-        }
-    }
-
-    return lexeme;
+    return (char *)"undef";
 }
 
 bool is_keyword(char *lexeme)
 {
-    for (size_t i = 0; i < sizeof(keywordtab) / sizeof(tab); i++)
+    for (int i = 0; keywordtab[i].token != nfound; i++)
     {
         if (!strcmp(lexeme, keywordtab[i].text))
         {

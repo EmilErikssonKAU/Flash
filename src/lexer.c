@@ -52,6 +52,39 @@ static void skip()
         input_pos++;
 }
 
+static bool is_operator_start()
+{
+    if (peak() == '>')
+    {
+        return true;
+    }
+
+    if ((peak() == '1' || peak() == '2') && double_peak() == '>')
+    {
+        return true;
+    }
+
+    return false;
+}
+
+static size_t scan_operator()
+{
+    if ((peak() == '1' || peak() == '2') && double_peak() == '>')
+    {
+        next();
+        next();
+        return 2;
+    }
+
+    if (peak() == '>')
+    {
+        next();
+        return 1;
+    }
+
+    return 0;
+}
+
 static bool handle_singlequotes(void)
 {
     skip();
@@ -111,8 +144,22 @@ int get_token()
         }
     }
 
+    if (peak() == '\0')
+    {
+        return TOK_UNDEF;
+    }
+
+    if (is_operator_start())
+    {
+        if (scan_operator() == 0)
+        {
+            return TOK_UNDEF;
+        }
+        return lex2tok(lexeme_buffer);
+    }
+
     // Read keyword or word
-    while (!isspace(peak()) && peak() != '\0')
+    while (!isspace(peak()) && peak() != '\0' && !is_operator_start())
     {
         if (peak() == '\\')
         {
@@ -122,12 +169,12 @@ int get_token()
         else if (peak() == '\"')
         {
             if (!handle_doublequotes())
-                return undef;
+                return TOK_UNDEF;
         }
         else if (peak() == '\'')
         {
             if (!handle_singlequotes())
-                return undef;
+                return TOK_UNDEF;
         }
         else
         {
