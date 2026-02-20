@@ -11,6 +11,11 @@ typedef enum
     REDIR_FD2
 } RedirKind;
 
+typedef enum
+{
+    CommandNode
+} NodeType;
+
 typedef struct
 {
     RedirKind kind;
@@ -35,8 +40,10 @@ typedef struct
     RedirVec redirs;
 } AstCommand;
 
+// Only AstCommand for now.
 typedef struct AstNode
 {
+    NodeType nodetype;
     AstCommand *cmd;
 } AstNode;
 

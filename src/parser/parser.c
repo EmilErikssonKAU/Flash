@@ -1,7 +1,7 @@
 #include "parser.h"
-#include "tokentable.h"
-#include "ast.h"
-#include "lexer.h"
+#include "lexer/tokentable.h"
+#include "ast/ast.h"
+#include "lexer/lexer.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -44,6 +44,7 @@ AstNode *parse_input()
 
     AstNode *asttree = malloc(sizeof(AstNode));
     asttree->cmd = parse_command_line();
+    asttree->nodetype = CommandNode;
     return asttree;
 }
 
