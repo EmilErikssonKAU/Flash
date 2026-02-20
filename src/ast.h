@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef enum
 {
@@ -34,5 +35,5 @@ typedef struct
 
 typedef struct AstNode
 {
-    AstCommand cmd;
+    AstCommand *cmd;
 } AstNode;

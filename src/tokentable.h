@@ -1,25 +1,24 @@
 #pragma once
 #include <stdbool.h>
+#include <stddef.h>
 
-#define nfound -1
-
-typedef enum tokenvalues
+typedef enum
 {
-   tstart = 257,
-   TOK_UNDEF,
-   TOK_WORD,
-   TOK_NUMBER,
-   TOK_EXIT,
-   TOK_ECHO,
-   TOK_TYPE,
-   TOK_PWD,
-   TOK_CD,
-   TOK_REDIR_STDOUT,
-   TOK_REDIR_STDOUT_FD1,
-   TOK_REDIR_STDERR,
-} tokentype;
+    TOK_WORD,
+    TOK_REDIR_STDOUT,
+    TOK_REDIR_FD1,
+    TOK_REDIR_FD2,
+    TOK_NL,
+    TOK_EOF,
+    TOK_ERR
+} TokKind;
 
-tokentype lex2tok(char *fplex); /* convert a lexeme  to a token    */
-tokentype key2tok(char *fplex); /* convert a keyword to a token    */
-char *tok2lex(tokentype ftok);  /* convert a token   to a lexeme   */
-bool is_keyword(char *lexeme);
+typedef struct
+{
+    TokKind kind;
+    const char *lexeme;
+    size_t len;
+} Token;
+
+bool is_keyword(const char *lexeme);
+bool isRedirect(TokKind tok);

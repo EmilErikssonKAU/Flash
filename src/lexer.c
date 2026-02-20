@@ -11,9 +11,8 @@ static char input_buffer[BUFSIZE];
 static char lexeme_buffer[LEXSIZE];
 static size_t input_pos = 0;  /* current index program input_buffer  */
 static size_t lexeme_pos = 0; /* current index lexeme  input_buffer  */
-static bool hasRead = false;
 
-bool fill_input_buffer(char *input)
+bool fill_input_buffer(const char *input)
 {
     int i = 0;
     while (i < BUFSIZE - 1 && input[i] != '\0')
@@ -67,22 +66,25 @@ static bool is_operator_start()
     return false;
 }
 
-static size_t scan_operator()
+static bool scan_operator(TokKind *kind)
 {
     if ((peak() == '1' || peak() == '2') && double_peak() == '>')
     {
+        char fd = peak();
         next();
         next();
-        return 2;
+        *kind = (fd == '1') ? TOK_REDIR_FD1 : TOK_REDIR_FD2;
+        return true;
     }
 
     if (peak() == '>')
     {
         next();
-        return 1;
+        *kind = TOK_REDIR_STDOUT;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 static bool handle_singlequotes(void)
@@ -122,12 +124,21 @@ static bool handle_doublequotes(void)
     return true;
 }
 
-char *get_rest_of_input_buffer()
+const char *get_rest_of_input_buffer()
 {
     return &input_buffer[input_pos + 1];
 }
 
-int get_token()
+static Token make_token(TokKind kind)
+{
+    return (Token){
+        .kind = kind,
+        .lexeme = lexeme_buffer,
+        .len = lexeme_pos,
+    };
+}
+
+Token get_token(void)
 {
     // TODO: Handle case when buffer is not filled
 
@@ -135,27 +146,31 @@ int get_token()
     memset(lexeme_buffer, 0, sizeof(lexeme_buffer));
     lexeme_pos = 0;
 
-    // Ignore whitespace
-    if (isspace(peak()))
+    // Ignore whitespace except line feed, which is a token.
+    while (peak() != '\0' && peak() != '\n' && isspace((unsigned char)peak()))
     {
-        while (isspace(peak()))
-        {
-            skip();
-        }
+        skip();
+    }
+
+    if (peak() == '\n')
+    {
+        skip();
+        return make_token(TOK_NL);
     }
 
     if (peak() == '\0')
     {
-        return TOK_UNDEF;
+        return make_token(TOK_EOF);
     }
 
     if (is_operator_start())
     {
-        if (scan_operator() == 0)
+        TokKind operator_kind;
+        if (!scan_operator(&operator_kind))
         {
-            return TOK_UNDEF;
+            return make_token(TOK_ERR);
         }
-        return lex2tok(lexeme_buffer);
+        return make_token(operator_kind);
     }
 
     // Read keyword or word
@@ -169,22 +184,22 @@ int get_token()
         else if (peak() == '\"')
         {
             if (!handle_doublequotes())
-                return TOK_UNDEF;
+                return make_token(TOK_ERR);
         }
         else if (peak() == '\'')
         {
             if (!handle_singlequotes())
-                return TOK_UNDEF;
+                return make_token(TOK_ERR);
         }
         else
         {
             next();
         }
     }
-    return lex2tok(lexeme_buffer);
+    return make_token(TOK_WORD);
 }
 
-char *get_lexeme()
+const char *get_lexeme(void)
 {
     if (lexeme_buffer[0] == '\0')
         return NULL;

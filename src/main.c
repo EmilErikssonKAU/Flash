@@ -98,12 +98,7 @@ int main(int argc, char *argv[])
 
   char *cmd_argv[MAX_ARGS];
 
-  char *input_buffer[BUF_SIZE];
-  char *output_buffer[BUF_SIZE];
-  char *error_buffer[BUF_SIZE];
-
   char *lexemes[MAX_ARGS];
-  int tokens[MAX_ARGS];
 
   // Read-Eval-Print Loop
   while (true)
@@ -115,18 +110,24 @@ int main(int argc, char *argv[])
 
     fill_input_buffer(buf);
     int j = 0;
-    tokens[j] = get_token();
+    Token token = get_token();
 
 
     // LEXEMIZE THE INPUT
     while (j < MAX_ARGS - 2)
     {
-      char *lex = get_lexeme();
-      if (lex == NULL)
+      if (token.kind == TOK_EOF || token.kind == TOK_NL)
+      {
         break;
-      lexemes[j] = strdup(lex);
+      }
+      if (token.kind == TOK_ERR || token.lexeme == NULL)
+      {
+        break;
+      }
+
+      lexemes[j] = strdup(token.lexeme);
       j++;
-      tokens[j] = get_token();
+      token = get_token();
     }
     lexemes[j] = NULL;
 

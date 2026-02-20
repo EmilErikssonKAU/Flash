@@ -1,7 +1,8 @@
 #pragma once
 #include <stdbool.h>
+#include "tokentable.h"
 
-bool fill_input_buffer(char *input);
-char *get_rest_of_input_buffer();
-int get_token();
-char *get_lexeme();
+bool fill_input_buffer(const char *input);
+const char *get_rest_of_input_buffer();
+Token get_token(void);
+const char *get_lexeme(void);
