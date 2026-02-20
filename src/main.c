@@ -98,9 +98,9 @@ int main(int argc, char *argv[])
 
   char *cmd_argv[MAX_ARGS];
 
-  char *input_file = NULL;
-  char *output_file = NULL;
-  char *error_file = NULL;
+  char *input_buffer[BUF_SIZE];
+  char *output_buffer[BUF_SIZE];
+  char *error_buffer[BUF_SIZE];
 
   char *lexemes[MAX_ARGS];
   int tokens[MAX_ARGS];
@@ -117,6 +117,8 @@ int main(int argc, char *argv[])
     int j = 0;
     tokens[j] = get_token();
 
+
+    // LEXEMIZE THE INPUT
     while (j < MAX_ARGS - 2)
     {
       char *lex = get_lexeme();
@@ -126,9 +128,15 @@ int main(int argc, char *argv[])
       j++;
       tokens[j] = get_token();
     }
-
     lexemes[j] = NULL;
 
+    // DETERMINE END OF COMMAND
+
+    // PARSE ONE COMMAND
+
+    // EXECUTE ON COMMAND
+
+    // HANDLE REDIRECTS OF OUTPUT_BUFFER
     if (lexemes[0] == NULL || lexemes[0][0] == '\0')
     {
       continue;
