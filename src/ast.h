@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -37,3 +39,5 @@ typedef struct AstNode
 {
     AstCommand *cmd;
 } AstNode;
+
+void free_ast(AstNode *ast);

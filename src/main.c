@@ -8,10 +8,10 @@
 
 #include "lexer.h"
 #include "tokentable.h"
+#include "parser.h"
 
 #define MAX_INPUT_LENGTH 100
 #define BUF_SIZE 1024
-#define MAX_ARGS 20
 
 char *extractPath(const char *PATH)
 {
@@ -65,17 +65,6 @@ char *expand_path(const char *path)
   return expanded_path;
 }
 
-void build_argv(char *lexemes[], char *argv[])
-{
-  int i = 0;
-  while (i < MAX_ARGS - 1 && lexemes[i] != NULL)
-  {
-    argv[i] = lexemes[i];
-    i++;
-  }
-  argv[i] = NULL;
-}
-
 void execute_program(char *argv[])
 {
   pid_t pid = fork();
@@ -96,10 +85,6 @@ int main(int argc, char *argv[])
   setbuf(stdout, NULL); // Flush after every printf
   char buf[BUF_SIZE];
 
-  char *cmd_argv[MAX_ARGS];
-
-  char *lexemes[MAX_ARGS];
-
   // Read-Eval-Print Loop
   while (true)
   {
@@ -109,121 +94,97 @@ int main(int argc, char *argv[])
     buf[strlen(buf) - 1] = '\0'; // Remove newline
 
     fill_input_buffer(buf);
-    int j = 0;
-    Token token = get_token();
 
+    AstNode *asttree = parse_input();
 
-    // LEXEMIZE THE INPUT
-    while (j < MAX_ARGS - 2)
+    if (asttree == NULL || asttree->cmd == NULL || asttree->cmd->argv.v == NULL || asttree->cmd->argv.n == 0 || asttree->cmd->argv.v[0] == NULL || asttree->cmd->argv.v[0][0] == '\0')
     {
-      if (token.kind == TOK_EOF || token.kind == TOK_NL)
-      {
-        break;
-      }
-      if (token.kind == TOK_ERR || token.lexeme == NULL)
-      {
-        break;
-      }
-
-      lexemes[j] = strdup(token.lexeme);
-      j++;
-      token = get_token();
-    }
-    lexemes[j] = NULL;
-
-    // DETERMINE END OF COMMAND
-
-    // PARSE ONE COMMAND
-
-    // EXECUTE ON COMMAND
-
-    // HANDLE REDIRECTS OF OUTPUT_BUFFER
-    if (lexemes[0] == NULL || lexemes[0][0] == '\0')
-    {
+      free_ast(asttree);
       continue;
     }
 
-    if (!strcmp(lexemes[0], "exit"))
+    char **cmd_argv = asttree->cmd->argv.v;
+    bool should_exit = false;
+
+    if (!strcmp(cmd_argv[0], "exit"))
     {
-      break;
+      should_exit = true;
     }
 
-    else if (!strcmp(lexemes[0], "echo"))
+    else if (!strcmp(cmd_argv[0], "echo"))
     {
       int i = 1;
-      while (lexemes[i] != NULL)
+      while (cmd_argv[i] != NULL)
       {
         if (i > 1)
           printf(" ");
-        printf("%s", lexemes[i]);
+        printf("%s", cmd_argv[i]);
         i++;
       }
       printf("\n");
     }
 
-    else if (!strcmp(lexemes[0], "type"))
+    else if (!strcmp(cmd_argv[0], "type"))
     {
-      if (lexemes[1] == NULL || lexemes[1][0] == '\0')
+      if (cmd_argv[1] == NULL || cmd_argv[1][0] == '\0')
       {
+        free_ast(asttree);
         continue;
       }
 
-      if (is_keyword(lexemes[1]))
+      if (is_keyword(cmd_argv[1]))
       {
-        printf("%s is a shell builtin\n", lexemes[1]);
+        printf("%s is a shell builtin\n", cmd_argv[1]);
       }
 
-      else if (!checkPath(lexemes[1], true))
+      else if (!checkPath(cmd_argv[1], true))
       {
-        printf("%s: not found\n", lexemes[1]);
+        printf("%s: not found\n", cmd_argv[1]);
       }
     }
 
-    else if (!strcmp(lexemes[0], "pwd"))
+    else if (!strcmp(cmd_argv[0], "pwd"))
     {
       char cwd[BUF_SIZE];
       getcwd(cwd, sizeof(cwd));
       printf("%s\n", cwd);
     }
 
-    else if (!strcmp(lexemes[0], "cd"))
+    else if (!strcmp(cmd_argv[0], "cd"))
     {
 
-      if (lexemes[1] == NULL || lexemes[1][0] == '\0')
+      if (cmd_argv[1] == NULL || cmd_argv[1][0] == '\0')
       {
+        free_ast(asttree);
         continue;
       }
 
       else
       {
-        char *expanded_path = expand_path(lexemes[1]);
+        char *expanded_path = expand_path(cmd_argv[1]);
 
         if (chdir(expanded_path))
         {
-          printf("cd: %s: No such file or directory\n", lexemes[1]);
+          printf("cd: %s: No such file or directory\n", cmd_argv[1]);
         }
 
         free(expanded_path);
       }
     }
 
-    else if (checkPath(lexemes[0], false))
+    else if (checkPath(cmd_argv[0], false))
     {
-      build_argv(lexemes, cmd_argv);
       execute_program(cmd_argv);
     }
 
     else
     {
-      printf("%s: command not found\n", buf);
+      printf("%s: command not found\n", cmd_argv[0]);
     }
 
-    // Clear lexemes, and free memory
-    for (int i = 0; i < j; i++)
-    {
-      free(lexemes[i]);
-    }
-    memset(lexemes, 0, sizeof(lexemes));
+    free_ast(asttree);
+    if (should_exit)
+      break;
   }
 
   return 0;
