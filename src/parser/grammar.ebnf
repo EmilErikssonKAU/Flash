@@ -1,0 +1,24 @@
+input =
+      command_line '\n'
+    | command_line EOF
+    | '\n'
+    | EOF
+;
+
+command_line =
+    command [ redirect_list ]
+;
+
+command =
+    WORD { WORD }        
+;
+
+redirect_list =
+    redirect { redirect }
+;
+
+redirect =
+      '>'  WORD
+    | '1>' WORD
+    | '2>' WORD
+;
