@@ -22,7 +22,7 @@ ExecResult exec_simple_command(AstNode *node)
 
     if (isBuiltIn(argv[0]))
     {
-        if (executeBuiltIn(argc, argv))
+        if (executeBuiltIn(argc, argv, &redirs))
         {
             exec_result.status = 0;
         }
@@ -33,7 +33,7 @@ ExecResult exec_simple_command(AstNode *node)
     }
     else if (checkPath(argv[0], false))
     {
-        if (execute_program(argv))
+        if (execute_program(argv, &redirs))
         {
             exec_result.status = 0;
         }

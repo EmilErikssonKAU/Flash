@@ -9,4 +9,4 @@ typedef struct
 
 ExecResult exec(AstNode *node);
 ExecResult exec_simple_command(AstNode *node);
-bool execute_program(char *argv[]);
+bool execute_program(char *argv[], RedirVec *redir);

@@ -63,7 +63,7 @@ static AstCommand *parse_command_line()
     else
     {
         commandnode->redirs.v = NULL;
-        commandnode->redirs.v = 0;
+        commandnode->redirs.n = 0;
     }
 
     return commandnode;

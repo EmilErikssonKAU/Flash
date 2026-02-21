@@ -1,4 +1,5 @@
 #include "builtin.h"
+#include "exec/redir.h"
 #include <string.h>
 
 static const BuiltinEntry builtins[] = {
@@ -28,13 +29,19 @@ bool isBuiltIn(char *word)
     return false;
 }
 
-bool executeBuiltIn(int argc, char *argv[])
+bool executeBuiltIn(int argc, char *argv[], RedirVec *redirs)
 {
     for (size_t i = 0; i < sizeof(builtins) / sizeof(builtins[0]); i++)
     {
         if (!strcmp(builtins[i].name, argv[0]))
         {
-            return builtins[i].funct(argc, argv);
+            int stored_fds[2] = {-1, -1};
+
+            apply_redirs(redirs, stored_fds, true);
+            bool status = builtins[i].funct(argc, argv);
+            restore_redirs(stored_fds);
+
+            return status;
         }
     }
 
