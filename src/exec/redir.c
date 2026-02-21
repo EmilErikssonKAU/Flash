@@ -55,11 +55,11 @@ void restore_redirs(int stored_fds[2])
     if (stored_fds[0] != -1)
     {
         dup2(stored_fds[0], STDOUT_FILENO);
-        close(stored_fds);
+        close(stored_fds[0]);
     }
     if (stored_fds[1] != -1)
     {
         dup2(stored_fds[1], STDOUT_FILENO);
-        close(stored_fds);
+        close(stored_fds[1]);
     }
 }
