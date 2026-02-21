@@ -35,6 +35,11 @@ static char double_peak()
     return input_buffer[input_pos + 1];
 }
 
+static char triple_peak()
+{
+    return input_buffer[input_pos + 2];
+}
+
 static void next()
 {
     if (lexeme_pos < LEXSIZE - 1)
@@ -68,6 +73,24 @@ static bool is_operator_start()
 
 static bool scan_operator(TokKind *kind)
 {
+    if ((peak() == '1' || peak() == '2') && double_peak() == '>' && triple_peak() == '>')
+    {
+        char fd = peak();
+        next();
+        next();
+        next();
+        *kind = (fd == '1') ? TOK_APPEND_FD1 : TOK_APPEND_FD2;
+        return true;
+    }
+
+    if (peak() == '>' && double_peak() == '>')
+    {
+        next();
+        next();
+        *kind = TOK_APPEND_STDOUT;
+        return true;
+    }
+
     if ((peak() == '1' || peak() == '2') && double_peak() == '>')
     {
         char fd = peak();

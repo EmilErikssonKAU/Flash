@@ -31,3 +31,14 @@ bool isRedirect(TokKind tok)
 
     return false;
 }
+
+// Appends are viewed as a subset of redirects
+bool isAppend(TokKind tok)
+{
+    if (tok == TOK_APPEND_FD1 || tok == TOK_APPEND_FD2 || tok == TOK_APPEND_STDOUT)
+    {
+        return true;
+    }
+
+    return false;
+}

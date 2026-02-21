@@ -1,5 +1,6 @@
 #include "redir.h"
 #include "ast/ast.h"
+#include "lexer/tokentable.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <errno.h>
@@ -42,7 +43,16 @@ bool apply_redirs(const RedirVec *redirs, int stored_fds[2], bool save_fds)
             }
         }
 
-        int fd = open(redir.target, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        int fd;
+
+        if (isAppend(redir.kind))
+        {
+            fd = open(redir.target, O_WRONLY | O_CREAT | O_APPEND, 0666);
+        }
+        else
+        {
+            fd = open(redir.target, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        }
         dup2(fd, target_fd);
         close(fd);
     }
