@@ -17,6 +17,12 @@ static int kind_to_fd(RedirKind kind)
         return STDOUT_FILENO;
     case REDIR_FD2:
         return STDERR_FILENO;
+    case APPEND_STDOUT:
+        return STDOUT_FILENO;
+    case APPEND_FD1:
+        return STDOUT_FILENO;
+    case APPEND_FD2:
+        return STDERR_FILENO;
     default:
         return -1;
     }
@@ -45,7 +51,7 @@ bool apply_redirs(const RedirVec *redirs, int stored_fds[2], bool save_fds)
 
         int fd;
 
-        if (isAppend(redir.kind))
+        if (isAppend(redirKindToTok(redir.kind)))
         {
             fd = open(redir.target, O_WRONLY | O_CREAT | O_APPEND, 0666);
         }
@@ -69,7 +75,7 @@ void restore_redirs(int stored_fds[2])
     }
     if (stored_fds[1] != -1)
     {
-        dup2(stored_fds[1], STDOUT_FILENO);
+        dup2(stored_fds[1], STDERR_FILENO);
         close(stored_fds[1]);
     }
 }

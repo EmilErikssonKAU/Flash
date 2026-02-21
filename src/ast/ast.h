@@ -8,7 +8,10 @@ typedef enum
 {
     REDIR_STDOUT,
     REDIR_FD1,
-    REDIR_FD2
+    REDIR_FD2,
+    APPEND_STDOUT,
+    APPEND_FD1,
+    APPEND_FD2
 } RedirKind;
 
 typedef enum

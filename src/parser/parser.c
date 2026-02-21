@@ -142,6 +142,21 @@ static Redir parse_redirect()
         redir.kind = REDIR_FD2;
         match(TOK_REDIR_FD2);
     }
+    else if (lookahead.kind == TOK_APPEND_STDOUT)
+    {
+        redir.kind = APPEND_STDOUT;
+        match(TOK_APPEND_STDOUT);
+    }
+    else if (lookahead.kind == TOK_APPEND_FD1)
+    {
+        redir.kind = APPEND_FD1;
+        match(TOK_APPEND_FD1);
+    }
+    else if (lookahead.kind == TOK_APPEND_FD2)
+    {
+        redir.kind = APPEND_FD2;
+        match(TOK_APPEND_FD2);
+    }
     redir.target = strndup(lookahead.lexeme, lookahead.len);
     match(TOK_WORD);
 

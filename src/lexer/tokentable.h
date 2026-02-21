@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stddef.h>
+#include "ast/ast.h"
 
 typedef enum
 {
@@ -26,3 +27,4 @@ typedef struct
 bool is_keyword(const char *lexeme);
 bool isRedirect(TokKind tok);
 bool isAppend(TokKind tok);
+TokKind redirKindToTok(RedirKind kind);
