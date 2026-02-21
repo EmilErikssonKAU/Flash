@@ -9,23 +9,28 @@
 #include "parser/parser.h"
 #include "exec/exec.h"
 #include "exec/path.h"
+#include "readline/readline.h"
+
+#include <readline/readline.h>
 
 #define MAX_INPUT_LENGTH 100
 #define BUF_SIZE 1024
 
+void init()
+{
+  init_readline();
+}
+
 int main(int argc, char *argv[])
 {
+  init();
   setbuf(stdout, NULL); // Flush after every printf
-  char buf[BUF_SIZE];
+  char *buf;
 
   // Read-Eval-Print Loop
   while (true)
   {
-    printf("$ ");
-    if (fgets(buf, MAX_INPUT_LENGTH, stdin) == NULL)
-      break;
-    buf[strlen(buf) - 1] = '\0'; // Remove newline
-
+    buf = readline("$");
     fill_input_buffer(buf);
 
     AstNode *asttree = parse_input();
