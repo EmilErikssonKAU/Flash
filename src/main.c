@@ -9,8 +9,7 @@
 #include "parser/parser.h"
 #include "exec/exec.h"
 #include "exec/path.h"
-#include "readline/readline.h"
-
+#include "readline/readline_custom.h"
 #include <readline/readline.h>
 
 #define MAX_INPUT_LENGTH 100
@@ -30,7 +29,8 @@ int main(int argc, char *argv[])
   // Read-Eval-Print Loop
   while (true)
   {
-    buf = readline("$");
+    buf = readline("$ ");
+
     fill_input_buffer(buf);
 
     AstNode *asttree = parse_input();
