@@ -5,20 +5,14 @@
 #include "path.h"
 #include <stdio.h>
 
-ExecResult exec_simple_command(AstNode *node)
+ExecResult exec_simple_command(AstCommand *cmd)
 {
     ExecResult exec_result;
     exec_result.shouldExit = false;
+    RedirVec redirs = cmd->redirs;
 
-    if (node->nodetype != CommandNode)
-    {
-        ; // panic
-    }
-
-    RedirVec redirs = node->cmd->redirs;
-
-    char **argv = node->cmd->argv.v;
-    size_t argc = node->cmd->argv.n;
+    char **argv = cmd->argv.v;
+    size_t argc = cmd->argv.n;
 
     if (isBuiltIn(argv[0]))
     {
