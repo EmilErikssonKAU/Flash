@@ -36,6 +36,18 @@ bool isRedirect(TokKind tok)
     return false;
 }
 
+bool isPipe(TokKind tok)
+{
+    if (tok == TOK_PIPELINE)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 // Appends are viewed as a subset of redirects
 bool isAppend(TokKind tok)
 {

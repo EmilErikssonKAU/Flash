@@ -68,6 +68,11 @@ static bool is_operator_start()
         return true;
     }
 
+    if (peak() == '|')
+    {
+        return true;
+    }
+
     return false;
 }
 
@@ -104,6 +109,13 @@ static bool scan_operator(TokKind *kind)
     {
         next();
         *kind = TOK_REDIR_STDOUT;
+        return true;
+    }
+
+    if (peak() == '|')
+    {
+        next();
+        *kind = TOK_PIPELINE;
         return true;
     }
 

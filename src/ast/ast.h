@@ -16,8 +16,17 @@ typedef enum
 
 typedef enum
 {
-    CommandNode
+    CommandNode,
+    PipelineNode,
+    AndOrNode,
+    ListNode
 } NodeType;
+
+typedef enum
+{
+    LOGIC_AND,
+    LOGIC_OR
+} LogicOp;
 
 typedef struct
 {
@@ -43,11 +52,38 @@ typedef struct
     RedirVec redirs;
 } AstCommand;
 
-// Only AstCommand for now.
-typedef struct AstNode
+typedef struct
+{
+    AstCommand *commands;
+    size_t n;
+} AstPipeline;
+
+typedef struct
+{
+    LogicOp op;
+    AstPipeline *pipeline;
+} AstAndOrLink;
+
+typedef struct
+{
+    AstPipeline first;
+    AstAndOrLink *links;
+    size_t n;
+} AstAndOr;
+
+typedef struct
+{
+    AstAndOr *items;
+    size_t n;
+} AstList;
+
+typedef struct
 {
     NodeType nodetype;
     AstCommand *cmd;
+    AstPipeline *pipeline;
+    AstAndOr *and_or;
+    AstList *list;
 } AstNode;
 
 void free_ast(AstNode *ast);

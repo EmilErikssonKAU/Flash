@@ -1,21 +1,12 @@
 input =
-      list '\n'
-    | list EOF
+      pipeline '\n'
+    | pipeline EOF
     | '\n'
     | EOF
 ;
 
-list =
-    and_or { ';' and_or }
-;
-
-and_or =
-    pipeline { ( '&&' | '||' ) pipeline }
-;
-
 pipeline = 
     command_line { '|' command_line }
-;
 
 command_line =
     command [ redirect_list ]

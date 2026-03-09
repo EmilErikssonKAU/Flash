@@ -14,7 +14,8 @@ typedef enum
     TOK_APPEND_FD2,
     TOK_NL,
     TOK_EOF,
-    TOK_ERR
+    TOK_ERR,
+    TOK_PIPELINE
 } TokKind;
 
 typedef struct
@@ -27,4 +28,5 @@ typedef struct
 bool is_keyword(const char *lexeme);
 bool isRedirect(TokKind tok);
 bool isAppend(TokKind tok);
+bool isPipe(TokKind tok);
 TokKind redirKindToTok(RedirKind kind);
