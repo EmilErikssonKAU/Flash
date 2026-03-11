@@ -65,9 +65,9 @@ AstNode *parse_input()
         return NULL;
     }
 
-    AstNode *asttree = malloc(sizeof(AstNode));
+    AstNode *asttree = calloc(1, sizeof(AstNode));
     asttree->pipeline = parse_pipeline();
-    asttree->nodetype = CommandNode;
+    asttree->nodetype = PipelineNode;
     return asttree;
 }
 

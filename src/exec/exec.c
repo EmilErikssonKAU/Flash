@@ -2,10 +2,10 @@
 
 ExecResult exec(AstNode *node)
 {
-    ExecResult exec_result;
+    ExecResult exec_result = {.status = 1, .shouldExit = false};
     if (node == NULL)
     {
-        ; // cry
+        return exec_result;
     }
 
     switch (node->nodetype)
@@ -21,6 +21,8 @@ ExecResult exec(AstNode *node)
         break;
     case (ListNode):
         exec_result = exec_list(node->list);
+        break;
+    default:
         break;
     }
 

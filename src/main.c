@@ -30,12 +30,17 @@ int main(int argc, char *argv[])
   while (true)
   {
     buf = readline("$ ");
+    if (buf == NULL)
+    {
+      break;
+    }
 
     fill_input_buffer(buf);
+    free(buf);
 
     AstNode *asttree = parse_input();
 
-    if (asttree == NULL || asttree->cmd == NULL || asttree->cmd->argv.v == NULL || asttree->cmd->argv.n == 0 || asttree->cmd->argv.v[0] == NULL || asttree->cmd->argv.v[0][0] == '\0')
+    if (asttree == NULL)
     {
       free_ast(asttree);
       continue;
