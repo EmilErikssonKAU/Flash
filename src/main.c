@@ -9,27 +9,30 @@
 #include "parser/parser.h"
 #include "exec/exec.h"
 #include "exec/path.h"
+#include "settings/settings.h"
 #include "readline/readline_custom.h"
 #include <readline/readline.h>
 
 #define MAX_INPUT_LENGTH 100
 #define BUF_SIZE 1024
 
-void init()
+Settings init()
 {
+  Settings settings = init_settings();
   init_readline();
+  return settings;
 }
 
 int main(int argc, char *argv[])
 {
-  init();
+  Settings settings = init();
   setbuf(stdout, NULL); // Flush after every printf
   char *buf;
 
   // Read-Eval-Print Loop
   while (true)
   {
-    buf = readline("$ ");
+    buf = readline(settings.prompt_text);
     if (buf == NULL)
     {
       break;
@@ -51,11 +54,13 @@ int main(int argc, char *argv[])
     if (exec_result.shouldExit)
     {
       free_ast(asttree);
+      free(settings.prompt_text);
       exit(1);
     }
 
     free_ast(asttree);
   }
 
+  free(settings.prompt_text);
   return 0;
 }
