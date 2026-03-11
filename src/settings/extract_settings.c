@@ -54,28 +54,58 @@ Color get_color(const char *file_path)
 
     while (fgets(line, sizeof(line), file) != NULL)
     {
-        // Search for $(COLOR_FIELD)=
-        if (strncmp(line, COLOR_FIELD, field_len) != 0)
+        const char *cursor = line;
+        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        {
+            cursor++;
+        }
+
+        if (strncmp(cursor, COLOR_FIELD, field_len) != 0)
         {
             continue;
         }
 
-        const char *cursor = line + field_len;
+        cursor += field_len;
+        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        {
+            cursor++;
+        }
+
         if (*cursor != '=')
         {
             continue;
         }
         cursor++;
 
+        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        {
+            cursor++;
+        }
+
+        size_t raw_len = strcspn(cursor, "\r\n");
+        while (raw_len > 0 && isspace((unsigned char)cursor[raw_len - 1]))
+        {
+            raw_len--;
+        }
+
+        size_t start = 0;
+        size_t end = raw_len;
+        if (raw_len >= 2 &&
+            ((cursor[0] == '"' && cursor[raw_len - 1] == '"') ||
+             (cursor[0] == '\'' && cursor[raw_len - 1] == '\'')))
+        {
+            start = 1;
+            end = raw_len - 1;
+        }
+
         char value[64];
         size_t value_len = 0;
-        while (*cursor != '\0' && *cursor != '\n' && !isspace((unsigned char)*cursor))
+        for (size_t i = start; i < end; i++)
         {
             if (value_len + 1 < sizeof(value))
             {
-                value[value_len++] = *cursor;
+                value[value_len++] = cursor[i];
             }
-            cursor++;
         }
         value[value_len] = '\0';
 
@@ -95,17 +125,32 @@ char *get_prompt(const char *file_path)
 
     while (fgets(line, sizeof(line), file) != NULL)
     {
-        if (strncmp(line, PROMPT_FIELD, field_len) != 0)
+        const char *cursor = line;
+        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        {
+            cursor++;
+        }
+
+        if (strncmp(cursor, PROMPT_FIELD, field_len) != 0)
         {
             continue;
         }
 
-        const char *cursor = line + field_len;
+        cursor += field_len;
+        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        {
+            cursor++;
+        }
+
         if (*cursor != '=')
         {
             continue;
         }
         cursor++;
+        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        {
+            cursor++;
+        }
 
         size_t text_len = strcspn(cursor, "\r\n");
         size_t start = 0;
