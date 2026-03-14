@@ -35,12 +35,20 @@ static char *build_colored_prompt(const Settings *settings)
     const char *ansi = color_to_ansi(settings->prompt_color);
     const char *reset = "\033[0m";
     const char *text = settings->prompt_text;
+    const char *move_up_cursor = "\033[1A";
+
+    const int n_right = strlen(text);
+    size_t move_right_len = snprintf(NULL, 0, "\033[%dC", n_right) + 1;
+    char *move_right_cursor = malloc(move_right_len);
+    snprintf(move_right_cursor, move_right_len, "\033[%dC", n_right);
 
     size_t needed = 0;
     needed += 1 + strlen(ansi) + 1; // \001 + ansi + \002
     needed += strlen(text);
-    needed += 1 + strlen(reset) + 1; // \001 + reset + \002
-    needed += 1;                     // NUL
+    needed += 1 + strlen(reset) + 1;                                      // \001 + reset + \002
+    needed += 1;                                                          // \n
+    needed += 1 + strlen(move_up_cursor) + strlen(move_right_cursor) + 1; // \001 + move_up_cursor + \002
+    needed += 1;                                                          // NUL
 
     char *prompt = malloc(needed);
     if (prompt == NULL)
@@ -51,7 +59,7 @@ static char *build_colored_prompt(const Settings *settings)
     // \001 %s \002 indicates start and end of characters that takes up no physical screen space
     // Very unclear if I need this but it stays for now
 
-    snprintf(prompt, needed, "\001%s\002%s\001%s\002", ansi, text, reset);
+    snprintf(prompt, needed, "\001%s\002%s\001%s\002\n\001%s%s\002", ansi, text, reset, move_up_cursor, move_right_cursor);
     return prompt;
 }
 
