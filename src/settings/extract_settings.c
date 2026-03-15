@@ -8,6 +8,14 @@
 #define COLOR_FIELD "PS1_COLOR"
 #define PROMPT_FIELD "PS1_TEXT"
 
+// Prompt length, vital for cursor.c
+static int prompt_length = 0;
+
+int get_prompt_length()
+{
+    return prompt_length;
+}
+
 static bool color_equals_ignore_case(const char *value, const char *target)
 {
     if (value == NULL)
@@ -55,7 +63,7 @@ Color get_color(const char *file_path)
     while (fgets(line, sizeof(line), file) != NULL)
     {
         const char *cursor = line;
-        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        while (*cursor != '\0' && isspace(*cursor))
         {
             cursor++;
         }
@@ -66,7 +74,7 @@ Color get_color(const char *file_path)
         }
 
         cursor += field_len;
-        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        while (*cursor != '\0' && isspace(*cursor))
         {
             cursor++;
         }
@@ -77,13 +85,13 @@ Color get_color(const char *file_path)
         }
         cursor++;
 
-        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+        while (*cursor != '\0' && isspace(*cursor))
         {
             cursor++;
         }
 
         size_t raw_len = strcspn(cursor, "\r\n");
-        while (raw_len > 0 && isspace((unsigned char)cursor[raw_len - 1]))
+        while (raw_len > 0 && isspace(cursor[raw_len - 1]))
         {
             raw_len--;
         }
@@ -126,7 +134,9 @@ char *get_prompt(const char *file_path)
     while (fgets(line, sizeof(line), file) != NULL)
     {
         const char *cursor = line;
-        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+
+        // Remove possible whitespaces
+        while (*cursor != '\0' && isspace(*cursor))
         {
             cursor++;
         }
@@ -137,7 +147,9 @@ char *get_prompt(const char *file_path)
         }
 
         cursor += field_len;
-        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+
+        // Remove possible whitespaces
+        while (*cursor != '\0' && isspace(*cursor))
         {
             cursor++;
         }
@@ -147,7 +159,9 @@ char *get_prompt(const char *file_path)
             continue;
         }
         cursor++;
-        while (*cursor != '\0' && isspace((unsigned char)*cursor))
+
+        // Remove possible whitespaces
+        while (*cursor != '\0' && isspace(*cursor))
         {
             cursor++;
         }
@@ -156,6 +170,7 @@ char *get_prompt(const char *file_path)
         size_t start = 0;
         size_t end = text_len;
 
+        // Remove starting and trailing \"
         if (text_len >= 2 && cursor[0] == '"' && cursor[text_len - 1] == '"')
         {
             start = 1;
@@ -174,6 +189,9 @@ char *get_prompt(const char *file_path)
         prompt[out_len] = '\0';
 
         fclose(file);
+
+        prompt_length = out_len;
+
         return prompt;
     }
 

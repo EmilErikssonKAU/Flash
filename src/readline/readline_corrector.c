@@ -10,10 +10,11 @@ int readline_corrector()
     clear_line();
 
     // // // Print correction suggestion
-    printf("New suggestion!");
+    printf("\rNew suggestion!");
 
     // // Move cursor back up one row
     move_cursor_up();
 
     // Move cursor correct amount of steps forward
+    move_cursor_end_of_prompt();
 }
