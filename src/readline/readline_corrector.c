@@ -6,10 +6,14 @@ int readline_corrector()
     // Move down cursor one row
     move_cursor_down();
 
-    // Print correction suggestion
+    // // // Clear line
+    clear_line();
+
+    // // // Print correction suggestion
     printf("New suggestion!");
 
-    // Move cursor back up one row
+    // // Move cursor back up one row
+    move_cursor_up();
 
     // Move cursor correct amount of steps forward
 }
