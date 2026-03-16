@@ -1,34 +1,49 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/ee1a0c57-1a61-4e5e-9060-08158144c9c0)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# flash
 
-This is a starting point for C solutions to the
-["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
+A POSIX shell written in C23. Imitates traditional Bash behaviour, but provides command suggestions to user based on levenshtein distances.
 
-In this challenge, you'll build your own POSIX compliant shell that's capable of
-interpreting shell commands, running external programs and builtin commands like
-cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
-REPLs, builtin commands, and more.
+## Features
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+- Pipelines (`|`), conditional execution (`&&`, `||`), and sequencing (`;`)
+- I/O redirection (`>`, `>>`, `2>`, `2>>`)
+- Tab completion
+- "Did you mean" suggestion line. Shows the closest matching command as you type.
+- Configurable prompt via `~/.flashrc`
+- Builtins: `cd`, `echo`, `exit`, `pwd`, `type`
 
-# Passing the first stage
+## Build
 
-The entry point for your `shell` implementation is in `src/main.c`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
+Requires `cmake` and `vcpkg` (for readline).
 
 ```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
+cmake -B build -S .
+cmake --build ./build
+./build/shell
 ```
 
-Time to move on to the next stage!
+Or use the convenience script:
 
-# Stage 2 & beyond
+```sh
+./run.sh
+```
 
-Note: This section is for stages 2 and beyond.
+## Configuration
 
-1. Ensure you have `cmake` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `src/main.c`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+Create `~/.flashrc` to customize the prompt:
+
+```
+PS1_TEXT = "$ "       =>    Sets prompt text
+PS1_COLOR = green     =>    Sets prompt color
+```
+
+`PS1_COLOR` accepts `green`, `red`, `blue`, or `default`.
+
+## Contributing
+
+Format all C source files before submitting a pull request:
+
+```sh
+find src -name '*.c' -o -name '*.h' | xargs clang-format -i
+```
+
+Formatting is enforced automatically in CI.
