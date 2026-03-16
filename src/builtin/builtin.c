@@ -10,6 +10,16 @@ static const BuiltinEntry builtins[] = {
     {"type", builtin_type},
 };
 
+const char **get_builtin_names(int *count)
+{
+    static const char *names[sizeof(builtins) / sizeof(builtins[0])];
+    size_t n = sizeof(builtins) / sizeof(builtins[0]);
+    for (size_t i = 0; i < n; i++)
+        names[i] = builtins[i].name;
+    *count = (int)n;
+    return names;
+}
+
 bool isBuiltIn(char *word)
 {
     if (word == NULL || word[0] == '\0')

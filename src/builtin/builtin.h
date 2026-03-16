@@ -19,3 +19,4 @@ bool builtin_type(int argc, char **argv);
 
 bool isBuiltIn(char *word);
 bool executeBuiltIn(int argc, char **argv, RedirVec *redirs);
+const char **get_builtin_names(int *count);

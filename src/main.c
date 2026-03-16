@@ -16,10 +16,14 @@
 #define MAX_INPUT_LENGTH 100
 #define BUF_SIZE 1024
 
+static const char *clear_screen = "\033[2J\033[H";
+static const char *clear_suggestion_line = "\033[2K";
+
 Settings init()
 {
   Settings settings = init_settings();
   init_readline();
+  printf("%s", clear_screen); // Clear screen
   return settings;
 }
 
@@ -33,10 +37,13 @@ int main(int argc, char *argv[])
   while (true)
   {
     buf = readline(settings.prompt_text);
+
     if (buf == NULL)
     {
       break;
     }
+
+    printf("%s", clear_suggestion_line); // Clear the suggestion line the cursor landed on after Enter
 
     fill_input_buffer(buf);
     free(buf);
