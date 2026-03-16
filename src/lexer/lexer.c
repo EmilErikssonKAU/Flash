@@ -2,7 +2,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
-#include "tokentable.h"
+#include "lexer/tokentable.h"
 
 #define BUFSIZE 1024
 #define LEXSIZE 100

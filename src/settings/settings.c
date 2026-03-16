@@ -1,6 +1,6 @@
-#include "settings.h"
-#include "extract_settings.h"
-#include "../exec/path.h"
+#include "settings/settings.h"
+#include "settings/extract_settings.h"
+#include "exec/path.h"
 #include <stdlib.h>
 #include <string.h>
 

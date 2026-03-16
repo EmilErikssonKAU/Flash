@@ -1,4 +1,4 @@
-#include "builtin.h"
+#include "builtin/builtin.h"
 #include "exec/path.h"
 #include "lexer/tokentable.h"
 #include <stdio.h>

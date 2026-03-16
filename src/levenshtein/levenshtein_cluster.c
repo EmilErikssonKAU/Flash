@@ -1,5 +1,5 @@
-#include "levenshtein_cluster.h"
-#include "levenshtein.h"
+#include "levenshtein/levenshtein_cluster.h"
+#include "levenshtein/levenshtein.h"
 #include <string.h>
 
 int find_most_levenshtein(char *words[], int n)

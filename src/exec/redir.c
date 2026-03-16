@@ -1,4 +1,4 @@
-#include "redir.h"
+#include "exec/redir.h"
 #include "ast/ast.h"
 #include "lexer/tokentable.h"
 #include <stdbool.h>

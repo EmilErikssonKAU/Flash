@@ -1,7 +1,7 @@
-#include "readline_corrector.h"
-#include "../cursor/cursor.h"
-#include "../commands/commands.h"
-#include "../levenshtein/levenshtein_cluster.h"
+#include "readline/readline_corrector.h"
+#include "cursor/cursor.h"
+#include "commands/commands.h"
+#include "levenshtein/levenshtein_cluster.h"
 
 #include <readline/readline.h>
 #include <string.h>

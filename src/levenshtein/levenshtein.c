@@ -1,4 +1,4 @@
-#include "levenshtein.h"
+#include "levenshtein/levenshtein.h"
 #include <stdlib.h>
 #include <string.h>
 

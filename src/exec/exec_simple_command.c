@@ -1,8 +1,7 @@
-#include "exec.h"
-#include "ast/ast.h"
 #include "exec/exec.h"
+#include "ast/ast.h"
 #include "builtin/builtin.h"
-#include "path.h"
+#include "exec/path.h"
 #include <stdio.h>
 
 ExecResult exec_simple_command(AstCommand *cmd)

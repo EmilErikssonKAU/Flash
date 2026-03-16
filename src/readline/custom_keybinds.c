@@ -1,4 +1,4 @@
-#include "custom_keybinds.h"
+#include "readline/custom_keybinds.h"
 #include <readline/readline.h>
 
 int guarded_backspace(int count, int key)

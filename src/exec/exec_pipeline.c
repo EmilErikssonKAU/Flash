@@ -1,7 +1,7 @@
-#include "exec.h"
+#include "exec/exec.h"
 #include "builtin/builtin.h"
-#include "path.h"
-#include "redir.h"
+#include "exec/path.h"
+#include "exec/redir.h"
 
 #include <stdio.h>
 #include <stdlib.h>

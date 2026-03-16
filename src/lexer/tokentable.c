@@ -1,4 +1,4 @@
-#include "tokentable.h"
+#include "lexer/tokentable.h"
 
 #include <string.h>
 

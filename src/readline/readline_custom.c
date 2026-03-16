@@ -1,5 +1,5 @@
-#include "readline_custom.h"
-#include "readline_corrector.h"
+#include "readline/readline_custom.h"
+#include "readline/readline_corrector.h"
 
 void init_readline()
 {

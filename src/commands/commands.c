@@ -1,5 +1,5 @@
-#include "commands.h"
-#include "../builtin/builtin.h"
+#include "commands/commands.h"
+#include "builtin/builtin.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -1,6 +1,6 @@
-#include "cursor.h"
+#include "cursor/cursor.h"
 #include <stdlib.h>
-#include "../settings/extract_settings.h"
+#include "settings/extract_settings.h"
 #include <readline/readline.h>
 
 void move_cursor_down()

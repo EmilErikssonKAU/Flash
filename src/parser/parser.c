@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "parser/parser.h"
 #include "lexer/tokentable.h"
 #include "ast/ast.h"
 #include "lexer/lexer.h"

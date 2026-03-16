@@ -2,9 +2,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "exec.h"
+#include "exec/exec.h"
 #include "ast/ast.h"
-#include "redir.h"
+#include "exec/redir.h"
 
 bool execute_program(char *argv[], RedirVec *redirs)
 {

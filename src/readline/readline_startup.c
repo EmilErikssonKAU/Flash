@@ -1,5 +1,5 @@
-#include "readline_startup.h"
-#include "custom_keybinds.h"
+#include "readline/readline_startup.h"
+#include "readline/custom_keybinds.h"
 
 int readline_startup(void)
 {
