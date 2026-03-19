@@ -1,13 +1,13 @@
 #include "settings/settings.h"
-#include "settings/extract_settings.h"
 #include "exec/path.h"
+#include "settings/extract_settings.h"
 #include <stdlib.h>
 #include <string.h>
 
 #define FILENAME ".flashrc"
 #define DEFAULT_DIR "~"
 #define PATH_MAX 1000
-#define DEFAULT_PROMPT "$ "
+#define DEFAULT_PROMPT "flash: "
 
 static const char *color_to_ansi(Color color)
 {
@@ -66,6 +66,7 @@ static Settings default_settings(void)
     Settings settings;
     settings.prompt_color = DEFAULT;
     settings.prompt_text = strdup(DEFAULT_PROMPT);
+    set_prompt_length(strlen(DEFAULT_PROMPT));
     return settings;
 }
 
@@ -76,6 +77,7 @@ Settings init_settings(void)
     char flashrc_path[PATH_MAX];
     snprintf(flashrc_path, sizeof(flashrc_path), "%s/%s", DEFAULT_DIR, FILENAME);
     char *expanded_path = expand_path(flashrc_path);
+
     if (expanded_path == NULL)
     {
         return settings;
@@ -89,6 +91,7 @@ Settings init_settings(void)
 
     settings.prompt_color = get_color(expanded_path);
     char *prompt = get_prompt(expanded_path);
+
     if (prompt != NULL)
     {
         free(settings.prompt_text);

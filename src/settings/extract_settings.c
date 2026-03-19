@@ -1,6 +1,6 @@
 #include "settings/extract_settings.h"
-#include <stdbool.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +14,11 @@ static int prompt_length = 0;
 int get_prompt_length()
 {
     return prompt_length;
+}
+
+void set_prompt_length(int len)
+{
+    prompt_length = len;
 }
 
 static bool color_equals_ignore_case(const char *value, const char *target)
@@ -179,6 +184,7 @@ char *get_prompt(const char *file_path)
 
         size_t out_len = end - start;
         char *prompt = malloc(out_len + 1);
+
         if (prompt == NULL)
         {
             fclose(file);
@@ -197,6 +203,6 @@ char *get_prompt(const char *file_path)
 
     fclose(file);
 
-    // Return "$ " by default
-    return strdup("$ ");
+    // Shouldn't trigger if checking file exists before function call
+    return NULL;
 }
