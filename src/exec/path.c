@@ -9,24 +9,65 @@
 
 char *extractPath(const char *PATH)
 {
-    char *buf;
+    static char *path_ctx = NULL;
+    static char *path_buf = NULL;
+
     if (PATH != NULL)
-        buf = strdup(PATH);
+    {
+        free(path_buf);
+        path_buf = strdup(PATH);
+        if (path_buf == NULL)
+            return NULL;
+        path_ctx = path_buf;
+    }
+
+    if (path_ctx == NULL)
+        return NULL;
+
+    char *path_section = path_ctx;
+    char *delimiter = strchr(path_ctx, ':');
+
+    if (delimiter != NULL)
+    {
+        *delimiter = '\0';
+        path_ctx = delimiter + 1;
+    }
     else
-        buf = NULL;
-    char *path_section = strtok(buf, ":");
+    {
+        path_ctx = NULL;
+    }
+
     return path_section;
 }
 
 bool checkPath(const char *lexeme, bool should_print)
 {
+    if (lexeme == NULL || lexeme[0] == '\0')
+        return false;
+
+    // Explicit paths like ./a.out or /usr/bin/ls should not be resolved via PATH.
+    if (strchr(lexeme, '/') != NULL)
+    {
+        if (!access(lexeme, X_OK))
+        {
+            if (should_print)
+                printf("%s is %s\n", lexeme, lexeme);
+            return true;
+        }
+        return false;
+    }
+
     char *PATH = getenv("PATH");
+    if (PATH == NULL)
+        return false;
+
     char *path_section = extractPath(PATH);
 
     while (path_section != NULL)
     {
         char buffer[BUF_SIZE];
-        snprintf(buffer, sizeof(buffer), "%s/%s", path_section, lexeme);
+        const char *dir = (path_section[0] == '\0') ? "." : path_section;
+        snprintf(buffer, sizeof(buffer), "%s/%s", dir, lexeme);
 
         if (!access(buffer, X_OK))
         {
