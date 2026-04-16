@@ -8,6 +8,34 @@
 #define COLOR_FIELD "PS1_COLOR"
 #define PROMPT_FIELD "PS1_TEXT"
 
+void skip_leading_space(const char **cursor)
+{
+    while (**cursor != '\0' && isspace(**cursor))
+    {
+        (*cursor)++;
+    }
+}
+
+int len_without_trailing_space(int raw_len, const char *cursor)
+{
+    while (raw_len > 0 && isspace(cursor[raw_len - 1]))
+    {
+        raw_len--;
+    }
+
+    return raw_len;
+}
+
+bool has_leading_trailing_char(const char *cursor, int len, char target)
+{
+    if ((cursor[0] == target && cursor[len - 1] == target))
+    {
+        return true;
+    }
+
+    return false;
+}
+
 // Prompt length, vital for cursor.c
 static int prompt_length = 0;
 
@@ -59,6 +87,7 @@ static Color parse_color_value(const char *value)
     return DEFAULT;
 }
 
+// Supports formats: KEY=VALUE, KEY='VALUE', KEY="VALUE"
 Color get_color(const char *file_path)
 {
     FILE *file = fopen(file_path, "r");
@@ -68,21 +97,16 @@ Color get_color(const char *file_path)
     while (fgets(line, sizeof(line), file) != NULL)
     {
         const char *cursor = line;
-        while (*cursor != '\0' && isspace(*cursor))
-        {
-            cursor++;
-        }
+        skip_leading_space(&cursor);
 
+        // Verify existence of color KEY
         if (strncmp(cursor, COLOR_FIELD, field_len) != 0)
         {
             continue;
         }
 
         cursor += field_len;
-        while (*cursor != '\0' && isspace(*cursor))
-        {
-            cursor++;
-        }
+        skip_leading_space(&cursor);
 
         if (*cursor != '=')
         {
@@ -90,37 +114,30 @@ Color get_color(const char *file_path)
         }
         cursor++;
 
-        while (*cursor != '\0' && isspace(*cursor))
-        {
-            cursor++;
-        }
+        skip_leading_space(&cursor);
 
+        // including carriage return \r might be overkill
         size_t raw_len = strcspn(cursor, "\r\n");
-        while (raw_len > 0 && isspace(cursor[raw_len - 1]))
-        {
-            raw_len--;
-        }
+        raw_len = len_without_trailing_space(raw_len, cursor);
 
+        // Currently allowing quotes around VALUE
         size_t start = 0;
         size_t end = raw_len;
-        if (raw_len >= 2 &&
-            ((cursor[0] == '"' && cursor[raw_len - 1] == '"') ||
-             (cursor[0] == '\'' && cursor[raw_len - 1] == '\'')))
+        if (raw_len >= 2 && (has_leading_trailing_char(cursor, raw_len, '"') || has_leading_trailing_char(cursor, raw_len, '\'')))
         {
             start = 1;
             end = raw_len - 1;
         }
 
-        char value[64];
-        size_t value_len = 0;
-        for (size_t i = start; i < end; i++)
+        // Will change if I find extremely long color
+        int max_value_len = 64;
+        char value[max_value_len];
+        if (end - start >= max_value_len)
         {
-            if (value_len + 1 < sizeof(value))
-            {
-                value[value_len++] = cursor[i];
-            }
+            continue; // user invented som bs color
         }
-        value[value_len] = '\0';
+        memcpy(value, cursor + start, end - start);
+        value[end - start] = '\0';
 
         fclose(file);
         return parse_color_value(value);
@@ -130,6 +147,7 @@ Color get_color(const char *file_path)
     return DEFAULT;
 }
 
+// Supports formats: KEY=VALUE, KEY='VALUE', KEY="VALUE"
 char *get_prompt(const char *file_path)
 {
     FILE *file = fopen(file_path, "r");
@@ -139,12 +157,7 @@ char *get_prompt(const char *file_path)
     while (fgets(line, sizeof(line), file) != NULL)
     {
         const char *cursor = line;
-
-        // Remove possible whitespaces
-        while (*cursor != '\0' && isspace(*cursor))
-        {
-            cursor++;
-        }
+        skip_leading_space(&cursor);
 
         if (strncmp(cursor, PROMPT_FIELD, field_len) != 0)
         {
@@ -152,36 +165,30 @@ char *get_prompt(const char *file_path)
         }
 
         cursor += field_len;
-
-        // Remove possible whitespaces
-        while (*cursor != '\0' && isspace(*cursor))
-        {
-            cursor++;
-        }
+        skip_leading_space(&cursor);
 
         if (*cursor != '=')
         {
             continue;
         }
         cursor++;
+        skip_leading_space(&cursor);
 
-        // Remove possible whitespaces
-        while (*cursor != '\0' && isspace(*cursor))
-        {
-            cursor++;
-        }
+        // including carriage return \r might be overkill
+        size_t raw_len = strcspn(cursor, "\r\n");
 
-        size_t text_len = strcspn(cursor, "\r\n");
+        // NOTE: Allowing trailing space in prompt
+
+        // Currently allowing quotes around VALUE
         size_t start = 0;
-        size_t end = text_len;
-
-        // Remove starting and trailing \"
-        if (text_len >= 2 && cursor[0] == '"' && cursor[text_len - 1] == '"')
+        size_t end = raw_len;
+        if (raw_len >= 2 && (has_leading_trailing_char(cursor, raw_len, '"') || has_leading_trailing_char(cursor, raw_len, '\'')))
         {
             start = 1;
-            end = text_len - 1;
+            end = raw_len - 1;
         }
 
+        // Currently no limit on prompt lengt, might later enforce something
         size_t out_len = end - start;
         char *prompt = malloc(out_len + 1);
 

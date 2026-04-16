@@ -72,11 +72,12 @@ static Settings default_settings(void)
 
 Settings init_settings(void)
 {
+    // Default fallback
     Settings settings = default_settings();
 
     char flashrc_path[PATH_MAX];
     snprintf(flashrc_path, sizeof(flashrc_path), "%s/%s", DEFAULT_DIR, FILENAME);
-    char *expanded_path = expand_path(flashrc_path);
+    char *expanded_path = expand_path(flashrc_path); // DEFAULT_DIR set to ~
 
     if (expanded_path == NULL)
     {
