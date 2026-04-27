@@ -13,6 +13,15 @@ A POSIX shell written in C23. Imitates traditional Bash behaviour, but provides 
 
 ## Build
 
+Note: The project can only be built within a linux environment.
+
+Since the readline library is not currently being installed correctly with CMake, you should install it locally using 
+
+```sh
+ sudo apt update
+ sudo apt install -y libreadline-dev
+```
+
 Requires `cmake` and `vcpkg` (for readline).
 
 ```sh
@@ -41,6 +50,7 @@ PS1_COLOR = green     =>    Sets prompt color
 ## Contributing
 
 Format all C source files before submitting a pull request:
+
 
 ```sh
 find src -name '*.c' -o -name '*.h' | xargs clang-format -i
